@@ -6,14 +6,7 @@ import { authMiddleware } from "@/lib/auth/middleware";
 
 export async function GET(request: NextRequest) {
   try {
-    // Verify admin access
-    const user = await authMiddleware(request);
-
-    if (!user || user.role !== "admin") {
-      return NextResponse.json({ error: "Admin access required" }, { status: 403 });
-    }
-
-    // Get the latest terms (should only be one record)
+    // Public access - anyone can view terms
     const terms = await db
       .select()
       .from(termsAndConditions)

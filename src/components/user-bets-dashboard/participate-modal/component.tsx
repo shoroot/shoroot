@@ -31,7 +31,7 @@ export function ParticipateModal({
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showTermsModal, setShowTermsModal] = useState(false);
   const [termsContent, setTermsContent] = useState("");
-  const { user } = useAuth();
+  const { user, updateUser } = useAuth();
 
   const handleSubmit = async () => {
     if (!bet || !selectedOptionId || !user) return;
@@ -75,10 +75,25 @@ export function ParticipateModal({
 
   const handleTermsAccept = async () => {
     try {
+      const token = localStorage.getItem("token");
+      if (!token) {
+        console.error("No authentication token found");
+        return;
+      }
+
       const response = await fetch("/api/terms/accept", {
         method: "POST",
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
       });
+
       if (response.ok) {
+        // Update user in store to reflect accepted terms
+        updateUser({
+          hasAcceptedTerms: true,
+          acceptedTermsAt: new Date().toISOString(),
+        });
         setShowTermsModal(false);
         // Now proceed with participation
         await proceedWithParticipation();
