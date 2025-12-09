@@ -3,6 +3,7 @@ import jwt from "jsonwebtoken";
 import { db } from "@/lib/db";
 import { bets, betOptions } from "@/lib/db/schema";
 import { notifyAllUsers } from "@/lib/notifications";
+import { notifyBetCreation } from "@/lib/telegram";
 
 export async function POST(request: NextRequest) {
   try {
@@ -116,6 +117,15 @@ export async function POST(request: NextRequest) {
         betTitle: result.bet.title,
       }
     );
+
+    // Send Telegram notification about the new bet
+    notifyBetCreation({
+      id: result.bet.id,
+      title: result.bet.title,
+      description: result.bet.description,
+      amount: result.bet.amount,
+      options: result.options.map((opt) => opt.optionText),
+    });
 
     return NextResponse.json(
       {

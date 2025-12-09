@@ -4,6 +4,7 @@ import { db } from "@/lib/db";
 import { bets, betParticipations, betOptions } from "@/lib/db/schema";
 import { eq, and, count } from "drizzle-orm";
 import { notifyBetParticipants } from "@/lib/notifications";
+import { notifyBetStatusChange } from "@/lib/telegram";
 
 export async function POST(
   request: NextRequest,
@@ -162,6 +163,8 @@ export async function POST(
       .from(betParticipations)
       .where(eq(betParticipations.betId, betId));
 
+    const participationCount = participationResult?.count || 0;
+
     const formattedBet = {
       id: updatedBet.id,
       title: updatedBet.title,
@@ -173,10 +176,19 @@ export async function POST(
         id: opt.id,
         optionText: opt.optionText,
       })),
-      participationCount: participationResult?.count || 0,
+      participationCount: participationCount,
       createdAt: updatedBet.createdAt,
       updatedAt: updatedBet.updatedAt,
     };
+
+    // Send Telegram notification about the status change
+    notifyBetStatusChange({
+      id: updatedBet.id,
+      title: updatedBet.title,
+      status: updatedBet.status as "active" | "in-progress" | "resolved",
+      winningOption: updatedBet.winningOption,
+      participationCount: participationCount,
+    });
 
     return NextResponse.json({
       message: "Bet status updated successfully",
