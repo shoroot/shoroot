@@ -4,36 +4,45 @@ import { users } from "./schema";
 import bcrypt from "bcryptjs";
 import { eq } from "drizzle-orm";
 
+// Load environment variables with proper defaults
+const SUPER_ADMIN_EMAIL = process.env.SUPER_ADMIN_EMAIL || "admin@shoroot.com";
+const SUPER_ADMIN_PASSWORD = process.env.SUPER_ADMIN_PASSWORD || "admin123";
+
 async function seed() {
   try {
     console.log("🌱 Starting database seeding...");
+    console.log(`📧 Using email: ${SUPER_ADMIN_EMAIL}`);
 
     // Check if admin user already exists
-    const [existingAdmin] = await db
-      .select()
-      .from(users)
-      .where(eq(users.email, process.env.SUPER_ADMIN_EMAIL!));
+    try {
+      const existingAdmins = await db
+        .select()
+        .from(users)
+        .where(eq(users.email, SUPER_ADMIN_EMAIL));
 
-    if (existingAdmin) {
-      console.log("✅ Admin user already exists, skipping seed.");
-      return;
+      if (existingAdmins && existingAdmins.length > 0) {
+        console.log("✅ Admin user already exists, skipping seed.");
+        return;
+      }
+    } catch (checkError) {
+      console.log("ℹ️ First time setup - creating admin user...");
     }
 
     // Create admin user
-    const hashedPassword = bcrypt.hashSync(
-      process.env.SUPER_ADMIN_PASSWORD!,
-      10
-    );
+    const hashedPassword = bcrypt.hashSync(SUPER_ADMIN_PASSWORD, 10);
 
-    await db.insert(users).values({
-      email: process.env.SUPER_ADMIN_EMAIL!,
+    const result = await db.insert(users).values({
+      email: SUPER_ADMIN_EMAIL,
+      fullName: "Admin User",
       password: hashedPassword,
       role: "admin",
-    });
+      hasAcceptedTerms: true,
+      acceptedTermsAt: new Date(),
+    }).returning();
 
     console.log("✅ Admin user created successfully!");
-    console.log(`📧 Email: ${process.env.SUPER_ADMIN_EMAIL}`);
-    console.log(`🔑 Password: ${process.env.SUPER_ADMIN_PASSWORD}`);
+    console.log(`📧 Email: ${SUPER_ADMIN_EMAIL}`);
+    console.log(`🔑 Password: ${SUPER_ADMIN_PASSWORD}`);
   } catch (error) {
     console.error("❌ Error seeding database:", error);
     throw error;
