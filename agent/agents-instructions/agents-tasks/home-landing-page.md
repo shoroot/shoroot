@@ -1,6 +1,9 @@
 ## Home Landing Page
 
 **Description:** Create a new public landing page to replace the current public dashboard. The landing page should have no public bet display, only marketing/info content.
+the page should have the join the action which takes the user to the auth page/ or the user dashboard for bets.
+another button to sign up page.
+and anoother which takes to the football matches page , which sould remain as is.
 
 **MD files to read before changes:**
 
