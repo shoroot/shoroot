@@ -59,7 +59,7 @@ function FullscreenSlide({ item }: { item: CarouselItem }) {
       />
 
       {/* Content */}
-      <div className="relative z-20 container mx-auto px-12 sm:px-16 md:px-20 h-full flex items-center">
+      <div className="relative z-20 container mx-auto px-12 sm:px-16 md:px-20 h-full flex items-center ">
         <div className="max-w-2xl space-y-6">
           <h1 className="text-4xl md:text-6xl font-bold text-foreground tracking-tight">
             {item.title}
@@ -173,12 +173,12 @@ export function HeroCarousel({
 
   return (
     <section
-      className="relative w-full h-[450px] sm:h-[500px] md:h-[550px] lg:h-[600px] xl:max-w-[1200px] xl:mx-auto xl:rounded-2xl xl:my-8 overflow-hidden bg-gradient-to-br from-primary/10 via-background to-secondary/20"
+      className="relative w-full h-[450px] sm:h-[500px] md:h-[550px] lg:h-[600px] xl:max-w-[1200px] xl:mx-auto xl:rounded-2xl xl:my-8 overflow-hidden bg-gradient-to-br from-primary/10 via-background to-secondary/20 "
       onMouseEnter={pause}
       onMouseLeave={resume}
     >
       {/* Carousel Slides */}
-      <div className="relative w-full h-full">
+      <div className="relative w-full h-full bg-gray-200">
         {items.map((item, index) => (
           <div
             key={item.id}
