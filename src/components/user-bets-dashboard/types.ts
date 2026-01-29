@@ -9,11 +9,13 @@ export interface Bet {
   description: string;
   amount: number;
   status: "active" | "in-progress" | "resolved";
+  visibility?: "public" | "private";
   winningOption?: string;
   winningOptionText?: string;
   options: BetOption[];
   participationCount: number;
   hasUserParticipated: boolean;
+  isAssigned?: boolean;
   createdAt: string;
 }
 
@@ -29,4 +31,4 @@ export interface UserBetsDashboardProps {
   // Add any props if needed
 }
 
-export type TabType = "all" | "active" | "in-progress" | "resolved";
+export type TabType = "all" | "active" | "in-progress" | "resolved" | "private";

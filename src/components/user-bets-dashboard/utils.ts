@@ -43,6 +43,8 @@ export const getTabLabel = (tab: TabType): string => {
       return "In Progress";
     case "resolved":
       return "Completed";
+    case "private":
+      return "Private";
     default:
       return "All Bets";
   }

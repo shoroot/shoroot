@@ -16,6 +16,7 @@ export function UserBetsDashboard() {
     active: [],
     "in-progress": [],
     resolved: [],
+    private: [],
   });
   const [userStats, setUserStats] = useState<UserStats | null>(null);
   const [betsLoading, setBetsLoading] = useState(true);
@@ -85,7 +86,7 @@ export function UserBetsDashboard() {
 
   const handleParticipateSubmit = async (
     betId: number,
-    selectedOptionId: number
+    selectedOptionId: number,
   ) => {
     try {
       const token = localStorage.getItem("token");
@@ -110,7 +111,7 @@ export function UserBetsDashboard() {
         const updated = { ...prev };
         Object.keys(updated).forEach((tab) => {
           updated[tab as TabType] = updated[tab as TabType].map((bet) =>
-            bet.id === betId ? { ...bet, hasUserParticipated: true } : bet
+            bet.id === betId ? { ...bet, hasUserParticipated: true } : bet,
           );
         });
         return updated;
@@ -143,22 +144,12 @@ export function UserBetsDashboard() {
       <div className="container mx-auto px-4 py-8">
         <Header />
 
-        {/* User Stats */}
-        {statsLoading ? (
-          <div className="flex items-center justify-center mb-8">
-            <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-primary"></div>
-            <span className="ml-2 text-muted-foreground">Loading stats...</span>
-          </div>
-        ) : userStats ? (
-          <StatsCards userStats={userStats} />
-        ) : null}
-
         <Tabs
           value={activeTab}
           onValueChange={(value) => setActiveTab(value as TabType)}
           className="w-full"
         >
-          <TabsList className="grid w-full grid-cols-4 mb-8">
+          <TabsList className="grid w-full grid-cols-5 mb-8">
             <TabsTrigger value="all" className="text-sm font-medium">
               📊 {getTabLabel("all")}
             </TabsTrigger>
@@ -170,6 +161,9 @@ export function UserBetsDashboard() {
             </TabsTrigger>
             <TabsTrigger value="resolved" className="text-sm font-medium">
               ✅ {getTabLabel("resolved")}
+            </TabsTrigger>
+            <TabsTrigger value="private" className="text-sm font-medium">
+              🔒 {getTabLabel("private")}
             </TabsTrigger>
           </TabsList>
 

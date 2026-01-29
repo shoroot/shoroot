@@ -38,7 +38,7 @@ const defaultCarouselItems: CarouselItem[] = [
   {
     id: 3,
     image: "/mr-shoroot-counting-cash.png",
-    title: "Win Big",
+    title: "Win Big Money Now",
     subtitle: "Track your performance and win",
     primaryButton: {
       text: "Start Betting",

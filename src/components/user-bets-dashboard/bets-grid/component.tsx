@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { Lock } from "lucide-react";
 import {
   Card,
   CardContent,
@@ -31,7 +32,7 @@ export function BetsGrid({ bets, activeTab, onParticipate }: BetsGridProps) {
         <Card
           key={bet.id}
           className={`${getCardBackgroundColor(
-            bet.status
+            bet.status,
           )} hover:shadow-xl transition-all duration-300 hover:scale-[1.02] group border-border/50`}
         >
           <CardHeader className="pb-4">
@@ -39,9 +40,20 @@ export function BetsGrid({ bets, activeTab, onParticipate }: BetsGridProps) {
               <CardTitle className="text-lg line-clamp-2 text-foreground group-hover:text-primary transition-colors">
                 {bet.title}
               </CardTitle>
-              <Badge className={`${getStatusColor(bet.status)} font-medium`}>
-                {bet.status.replace("-", " ")}
-              </Badge>
+              <div className="flex items-center gap-2">
+                {bet.visibility === "private" && (
+                  <Badge
+                    variant="outline"
+                    className="bg-amber-50 dark:bg-amber-900/30 border-amber-200 dark:border-amber-800 text-amber-700 dark:text-amber-300 font-medium flex items-center gap-1"
+                  >
+                    <Lock className="h-3 w-3" />
+                    Private
+                  </Badge>
+                )}
+                <Badge className={`${getStatusColor(bet.status)} font-medium`}>
+                  {bet.status.replace("-", " ")}
+                </Badge>
+              </div>
             </div>
             <CardDescription className="line-clamp-3 text-muted-foreground">
               {bet.description}
@@ -140,20 +152,26 @@ export function BetsGrid({ bets, activeTab, onParticipate }: BetsGridProps) {
             {activeTab === "all"
               ? "🎲"
               : activeTab === "active"
-              ? "⚡"
-              : activeTab === "in-progress"
-              ? "⏳"
-              : "✅"}
+                ? "⚡"
+                : activeTab === "in-progress"
+                  ? "⏳"
+                  : activeTab === "private"
+                    ? "🔒"
+                    : "✅"}
           </div>
           <p className="text-muted-foreground text-lg">
             {activeTab === "all"
               ? "No bets available at the moment."
-              : `No ${activeTab} bets found.`}
+              : activeTab === "private"
+                ? "No private bets found."
+                : `No ${activeTab} bets found.`}
           </p>
           <p className="text-muted-foreground/70 text-sm mt-2">
             {activeTab === "all"
               ? "Check back later for new betting opportunities!"
-              : "Try switching to a different tab to see more bets."}
+              : activeTab === "private"
+                ? "You don't have any private bets assigned to you."
+                : "Try switching to a different tab to see more bets."}
           </p>
         </div>
       )}

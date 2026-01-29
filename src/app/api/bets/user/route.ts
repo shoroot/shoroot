@@ -35,7 +35,7 @@ export async function GET(request: NextRequest) {
     const { searchParams } = new URL(request.url);
     const page = parseInt(searchParams.get("page") || "1");
     const limit = parseInt(searchParams.get("limit") || "10");
-    const tab = searchParams.get("tab") || "all"; // all, active, in-progress, resolved
+    const tab = searchParams.get("tab") || "all"; // all, active, in-progress, resolved, private
 
     if (page < 1 || limit < 1 || limit > 100) {
       return NextResponse.json(
@@ -56,6 +56,9 @@ export async function GET(request: NextRequest) {
       conditions.push(eq(bets.status, "in-progress"));
     } else if (tab === "resolved") {
       conditions.push(eq(bets.status, "resolved"));
+    } else if (tab === "private") {
+      // For private tab, only show private bets
+      conditions.push(eq(bets.visibility, "private"));
     }
 
     // Visibility filter for non-admin users
@@ -69,20 +72,35 @@ export async function GET(request: NextRequest) {
 
       const assignedBetIds = userAssignedBets.map((b) => b.betId);
 
-      // Build visibility condition: public OR (private AND in assigned list)
-      if (assignedBetIds.length > 0) {
-        conditions.push(
-          or(
-            eq(bets.visibility, "public"),
+      if (tab === "private") {
+        // For private tab, only show private bets the user is assigned to
+        if (assignedBetIds.length > 0) {
+          conditions.push(
             and(
               eq(bets.visibility, "private"),
               inArray(bets.id, assignedBetIds),
             ),
-          ),
-        );
+          );
+        } else {
+          // User has no private bets assigned, return empty
+          conditions.push(eq(bets.id, -1)); // Impossible condition to return empty
+        }
       } else {
-        // User has no private bets assigned, only show public
-        conditions.push(eq(bets.visibility, "public"));
+        // Build visibility condition: public OR (private AND in assigned list)
+        if (assignedBetIds.length > 0) {
+          conditions.push(
+            or(
+              eq(bets.visibility, "public"),
+              and(
+                eq(bets.visibility, "private"),
+                inArray(bets.id, assignedBetIds),
+              ),
+            ),
+          );
+        } else {
+          // User has no private bets assigned, only show public
+          conditions.push(eq(bets.visibility, "public"));
+        }
       }
     }
 

@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { Lock } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
@@ -84,13 +85,24 @@ export function BetDetails({ betId }: BetDetailsProps) {
                 {bet.description}
               </p>
             </div>
-            <Badge
-              className={`text-sm font-semibold px-3 py-1 ${getStatusColor(
-                bet.status
-              )}`}
-            >
-              {bet.status.replace("-", " ").toUpperCase()}
-            </Badge>
+            <div className="flex items-center gap-2">
+              {bet.visibility === "private" && (
+                <Badge
+                  variant="outline"
+                  className="bg-amber-50 dark:bg-amber-900/30 border-amber-200 dark:border-amber-800 text-amber-700 dark:text-amber-300 font-semibold px-3 py-1 flex items-center gap-1"
+                >
+                  <Lock className="h-4 w-4" />
+                  PRIVATE
+                </Badge>
+              )}
+              <Badge
+                className={`text-sm font-semibold px-3 py-1 ${getStatusColor(
+                  bet.status,
+                )}`}
+              >
+                {bet.status.replace("-", " ").toUpperCase()}
+              </Badge>
+            </div>
           </div>
         </CardHeader>
         <CardContent className="space-y-6">
@@ -121,17 +133,71 @@ export function BetDetails({ betId }: BetDetailsProps) {
             </div>
           </div>
 
-          {bet.status === "resolved" && bet.winningOption && (
-            <div className="bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 p-6 rounded-lg">
-              <div className="flex items-center gap-3 mb-2">
-                <div className="text-2xl">🏆</div>
-                <h3 className="text-xl font-bold text-green-800 dark:text-green-200">
-                  Winning Option
-                </h3>
+          {/* Winners Section for Resolved Bets */}
+          {bet.status === "resolved" && winners.length > 0 && (
+            <Card className="shadow-lg border-2 border-green-200 dark:border-green-800">
+              <CardHeader>
+                <CardTitle className="text-2xl flex items-center gap-3 text-green-700 dark:text-green-300">
+                  <div className="text-3xl">🏆</div>
+                  Champions ({winners.length})
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-4">
+                  {winners.map((winner: any) => (
+                    <div
+                      key={winner.id}
+                      className="flex items-center gap-4 p-6 bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-700 rounded-lg shadow-sm"
+                    >
+                      <div className="w-16 h-16 bg-green-500 rounded-full flex items-center justify-center shadow-lg">
+                        <span className="text-white text-xl font-bold">
+                          {(winner.userFullName || winner.userEmail)
+                            .charAt(0)
+                            .toUpperCase()}
+                        </span>
+                      </div>
+                      <div className="flex-1">
+                        <p className="font-bold text-green-800 dark:text-green-200 text-xl">
+                          {winner.userFullName || winner.userEmail}
+                        </p>
+                        <p className="text-green-700 dark:text-green-300 text-lg">
+                          Won with:{" "}
+                          <span className="font-semibold">
+                            {winner.selectedOptionText}
+                          </span>
+                        </p>
+                      </div>
+                      <div className="text-right">
+                        <Badge className="bg-green-500 hover:bg-green-600 text-white font-bold px-4 py-2 text-lg">
+                          Winner - {bet.amount}
+                        </Badge>
+                        <p className="text-sm text-green-600 dark:text-green-400 mt-2">
+                          Prize claimed!
+                        </p>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </CardContent>
+            </Card>
+          )}
+
+          {/* Private Bet Disclaimer */}
+          {bet.visibility === "private" && (
+            <div className="bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 p-6 rounded-lg">
+              <div className="flex items-start gap-3">
+                <Lock className="h-6 w-6 text-amber-600 dark:text-amber-400 flex-shrink-0 mt-0.5" />
+                <div>
+                  <h3 className="text-lg font-bold text-amber-800 dark:text-amber-200 mb-2">
+                    Private Bet
+                  </h3>
+                  <p className="text-amber-700 dark:text-amber-300">
+                    This bet is private and only visible to users who have been
+                    assigned by an admin. You can see and participate in this
+                    bet because you have been granted access.
+                  </p>
+                </div>
               </div>
-              <p className="text-green-700 dark:text-green-300 text-lg font-medium">
-                {bet.winningOption}
-              </p>
             </div>
           )}
         </CardContent>
@@ -235,12 +301,12 @@ export function BetDetails({ betId }: BetDetailsProps) {
                     <div className="text-right">
                       <div className="text-sm text-muted-foreground">
                         {new Date(
-                          participant.participatedAt
+                          participant.participatedAt,
                         ).toLocaleDateString()}
                       </div>
                       <div className="text-xs text-muted-foreground">
                         {new Date(
-                          participant.participatedAt
+                          participant.participatedAt,
                         ).toLocaleTimeString()}
                       </div>
                     </div>
@@ -261,55 +327,6 @@ export function BetDetails({ betId }: BetDetailsProps) {
           )}
         </CardContent>
       </Card>
-
-      {/* Winners Section for Resolved Bets */}
-      {bet.status === "resolved" && winners.length > 0 && (
-        <Card className="shadow-lg border-2 border-green-200 dark:border-green-800">
-          <CardHeader>
-            <CardTitle className="text-2xl flex items-center gap-3 text-green-700 dark:text-green-300">
-              <div className="text-3xl">🏆</div>
-              Champions ({winners.length})
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-4">
-              {winners.map((winner: any) => (
-                <div
-                  key={winner.id}
-                  className="flex items-center gap-4 p-6 bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-700 rounded-lg shadow-sm"
-                >
-                  <div className="w-16 h-16 bg-green-500 rounded-full flex items-center justify-center shadow-lg">
-                    <span className="text-white text-xl font-bold">
-                      {(winner.userFullName || winner.userEmail)
-                        .charAt(0)
-                        .toUpperCase()}
-                    </span>
-                  </div>
-                  <div className="flex-1">
-                    <p className="font-bold text-green-800 dark:text-green-200 text-xl">
-                      {winner.userFullName || winner.userEmail}
-                    </p>
-                    <p className="text-green-700 dark:text-green-300 text-lg">
-                      Won with:{" "}
-                      <span className="font-semibold">
-                        {winner.selectedOptionText}
-                      </span>
-                    </p>
-                  </div>
-                  <div className="text-right">
-                    <Badge className="bg-green-500 hover:bg-green-600 text-white font-bold px-4 py-2 text-lg">
-                      Winner - {bet.amount}
-                    </Badge>
-                    <p className="text-sm text-green-600 dark:text-green-400 mt-2">
-                      Prize claimed!
-                    </p>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </CardContent>
-        </Card>
-      )}
     </div>
   );
 }
