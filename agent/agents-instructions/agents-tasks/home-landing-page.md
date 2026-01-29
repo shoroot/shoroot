@@ -16,35 +16,37 @@ The new home page ([`src/app/page.tsx`](../../../src/app/page.tsx)) will have 4 
 
 #### 1. Hero Carousel Section
 
-- [ ] Create [`src/components/landing/hero-carousel/`](../../../src/components/landing/hero-carousel/)
-  - [ ] `component.tsx` - Auto-playing image carousel
-  - [ ] `types.ts` - Carousel item types
-  - [ ] `utils.ts` - Auto-play logic
-  - [ ] `index.ts` - Export
-- [ ] Auto-play with 5-second intervals
-- [ ] Manual navigation dots
-- [ ] Images with overlay text for CTA
-- [ ] "Get Started" / "Join Now" button linking to signup
+- [x] Create [`src/components/landing/hero-carousel/`](../../../src/components/landing/hero-carousel/)
+  - [x] `component.tsx` - Auto-playing image carousel with fullscreen and split variants
+  - [x] `types.ts` - Carousel item types with optional primary/secondary buttons
+  - [x] `utils.ts` - Auto-play logic
+  - [x] `index.ts` - Export
+- [x] Auto-play with 5-second intervals
+- [x] Manual navigation dots
+- [x] Images with overlay text for CTA
+- [x] "Get Started" / "Join Now" button linking to signup
+- [x] Optional buttons - only render if provided in item data
+- [x] Two layout variants: fullscreen (image background) and split (text left, image right)
 
 #### 2. Features Section
 
-- [ ] Create [`src/components/landing/features-section/`](../../../src/components/landing/features-section/)
-  - [ ] `component.tsx` - Feature cards grid
-  - [ ] `types.ts` - Feature item types
-  - [ ] `index.ts` - Export
-- [ ] 3-4 feature cards explaining the website:
+- [x] Create [`src/components/landing/features-section/`](../../../src/components/landing/features-section/)
+  - [x] `component.tsx` - Feature cards grid
+  - [x] `types.ts` - Feature item types
+  - [x] `index.ts` - Export
+- [x] 4 feature cards explaining the website:
   - Easy betting on various events
-  - Secure transactions
+  - Secure & Private
   - Real-time notifications
   - Track your performance
 
 #### 3. FAQ Section
 
-- [ ] Create [`src/components/landing/faq-section/`](../../../src/components/landing/faq-section/)
-  - [ ] `component.tsx` - Accordion-style FAQ
-  - [ ] `types.ts` - FAQ item types
-  - [ ] `index.ts` - Export
-- [ ] Questions to include:
+- [x] Create [`src/components/landing/faq-section/`](../../../src/components/landing/faq-section/)
+  - [x] `component.tsx` - Accordion-style FAQ
+  - [x] `types.ts` - FAQ item types
+  - [x] `index.ts` - Export
+- [x] Questions included:
   - How do I create an account?
   - How does betting work?
   - How can I participate in a bet?
@@ -53,12 +55,12 @@ The new home page ([`src/app/page.tsx`](../../../src/app/page.tsx)) will have 4 
 
 #### 4. Footer with Disclaimer
 
-- [ ] Create [`src/components/landing/footer/`](../../../src/components/landing/footer/)
-  - [ ] `component.tsx` - Footer with disclaimer
-  - [ ] `index.ts` - Export
-- [ ] Disclaimer text about responsible betting
-- [ ] Copyright notice
-- [ ] Links to terms and conditions
+- [x] Create [`src/components/landing/footer/`](../../../src/components/landing/footer/)
+  - [x] `component.tsx` - Footer with disclaimer
+  - [x] `index.ts` - Export
+- [x] Disclaimer text about responsible betting
+- [x] Copyright notice
+- [x] Links to terms and conditions, sign up, and login
 
 ### Component Structure
 
@@ -210,28 +212,28 @@ if necessary. Past performance does not guarantee future results.
 
 ### Files to Create
 
-- [ ] [`src/components/landing/hero-carousel/component.tsx`](../../../src/components/landing/hero-carousel/component.tsx)
-- [ ] [`src/components/landing/hero-carousel/types.ts`](../../../src/components/landing/hero-carousel/types.ts)
-- [ ] [`src/components/landing/hero-carousel/utils.ts`](../../../src/components/landing/hero-carousel/utils.ts)
-- [ ] [`src/components/landing/hero-carousel/index.ts`](../../../src/components/landing/hero-carousel/index.ts)
-- [ ] [`src/components/landing/features-section/component.tsx`](../../../src/components/landing/features-section/component.tsx)
-- [ ] [`src/components/landing/features-section/types.ts`](../../../src/components/landing/features-section/types.ts)
-- [ ] [`src/components/landing/features-section/index.ts`](../../../src/components/landing/features-section/index.ts)
-- [ ] [`src/components/landing/faq-section/component.tsx`](../../../src/components/landing/faq-section/component.tsx)
-- [ ] [`src/components/landing/faq-section/types.ts`](../../../src/components/landing/faq-section/types.ts)
-- [ ] [`src/components/landing/faq-section/index.ts`](../../../src/components/landing/faq-section/index.ts)
-- [ ] [`src/components/landing/footer/component.tsx`](../../../src/components/landing/footer/component.tsx)
-- [ ] [`src/components/landing/footer/index.ts`](../../../src/components/landing/footer/index.ts)
-- [ ] [`src/components/landing/index.ts`](../../../src/components/landing/index.ts)
+- [x] [`src/components/landing/hero-carousel/component.tsx`](../../../src/components/landing/hero-carousel/component.tsx)
+- [x] [`src/components/landing/hero-carousel/types.ts`](../../../src/components/landing/hero-carousel/types.ts)
+- [x] [`src/components/landing/hero-carousel/utils.ts`](../../../src/components/landing/hero-carousel/utils.ts)
+- [x] [`src/components/landing/hero-carousel/index.ts`](../../../src/components/landing/hero-carousel/index.ts)
+- [x] [`src/components/landing/features-section/component.tsx`](../../../src/components/landing/features-section/component.tsx)
+- [x] [`src/components/landing/features-section/types.ts`](../../../src/components/landing/features-section/types.ts)
+- [x] [`src/components/landing/features-section/index.ts`](../../../src/components/landing/features-section/index.ts)
+- [x] [`src/components/landing/faq-section/component.tsx`](../../../src/components/landing/faq-section/component.tsx)
+- [x] [`src/components/landing/faq-section/types.ts`](../../../src/components/landing/faq-section/types.ts)
+- [x] [`src/components/landing/faq-section/index.ts`](../../../src/components/landing/faq-section/index.ts)
+- [x] [`src/components/landing/footer/component.tsx`](../../../src/components/landing/footer/component.tsx)
+- [x] [`src/components/landing/footer/index.ts`](../../../src/components/landing/footer/index.ts)
+- [x] [`src/components/landing/index.ts`](../../../src/components/landing/index.ts)
 
 ### Files to Modify
 
-- [ ] [`src/app/page.tsx`](../../../src/app/page.tsx) - Replace with landing page
+- [x] [`src/app/page.tsx`](../../../src/app/page.tsx) - Replace with landing page
 
 ### Files to Remove/Deprecate
 
-- [ ] [`src/components/public-dashboard/`](../../../src/components/public-dashboard/) - No longer needed
-- [ ] [`src/app/api/bets/public/route.ts`](../../../src/app/api/bets/public/route.ts) - No longer needed
+- [x] [`src/components/public-dashboard/`](../../../src/components/public-dashboard/) - No longer needed
+- [x] [`src/app/api/bets/public/route.ts`](../../../src/app/api/bets/public/route.ts) - No longer needed
 
 ### Design Notes
 
