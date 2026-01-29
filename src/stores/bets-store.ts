@@ -169,7 +169,13 @@ export const useBetsStore = create<BetsStore>((set, get) => ({
 
   getSingleBet: async (betId: number): Promise<BetDetails> => {
     try {
-      const response = await fetch(`/api/bets/${betId}`);
+      const token = localStorage.getItem("token");
+      const headers: Record<string, string> = {};
+      if (token) {
+        headers["Authorization"] = `Bearer ${token}`;
+      }
+
+      const response = await fetch(`/api/bets/${betId}`, { headers });
       if (!response.ok) {
         throw new Error("Failed to fetch bet details");
       }

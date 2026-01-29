@@ -19,6 +19,7 @@ import { BetsTable } from "./bets-table";
 import { UserModal } from "./user-modal";
 import { BetModal } from "./bet-modal";
 import { StatusModal } from "./status-modal";
+import { AssigneesModal } from "./assignees-modal";
 
 export function AdminDashboard() {
   const [users, setUsers] = useState<User[]>([]);
@@ -33,10 +34,14 @@ export function AdminDashboard() {
   const [isUserModalOpen, setIsUserModalOpen] = useState(false);
   const [isBetModalOpen, setIsBetModalOpen] = useState(false);
   const [isStatusModalOpen, setIsStatusModalOpen] = useState(false);
+  const [isAssigneesModalOpen, setIsAssigneesModalOpen] = useState(false);
   const [userModalMode, setUserModalMode] = useState<"create" | "edit">(
-    "create"
+    "create",
   );
   const [betModalMode, setBetModalMode] = useState<"create" | "edit">("create");
+  const [visibilityFilter, setVisibilityFilter] = useState<
+    "all" | "public" | "private"
+  >("all");
   const { user } = useAuth();
 
   const handleCreateUser = () => {
@@ -54,7 +59,7 @@ export function AdminDashboard() {
   const handleDeleteUser = async (userId: number) => {
     if (
       !confirm(
-        "Are you sure you want to delete this user? This will also delete all their participations."
+        "Are you sure you want to delete this user? This will also delete all their participations.",
       )
     ) {
       return;
@@ -104,7 +109,7 @@ export function AdminDashboard() {
       if (!response.ok) {
         const errorData = await response.json();
         throw new Error(
-          errorData.error || `Failed to ${isCreate ? "create" : "update"} user`
+          errorData.error || `Failed to ${isCreate ? "create" : "update"} user`,
         );
       }
 
@@ -114,7 +119,7 @@ export function AdminDashboard() {
         setUsers([...users, result.user]);
       } else {
         setUsers(
-          users.map((u) => (u.id === selectedUser?.id ? result.user : u))
+          users.map((u) => (u.id === selectedUser?.id ? result.user : u)),
         );
       }
     } catch (error) {
@@ -140,10 +145,15 @@ export function AdminDashboard() {
     setIsStatusModalOpen(true);
   };
 
+  const handleManageAssignees = (bet: Bet) => {
+    setSelectedBet(bet);
+    setIsAssigneesModalOpen(true);
+  };
+
   const handleDeleteBet = async (betId: number) => {
     if (
       !confirm(
-        "Are you sure you want to delete this bet? This will also delete all options and participations."
+        "Are you sure you want to delete this bet? This will also delete all options and participations.",
       )
     ) {
       return;
@@ -193,7 +203,7 @@ export function AdminDashboard() {
       if (!response.ok) {
         const errorData = await response.json();
         throw new Error(
-          errorData.error || `Failed to ${isCreate ? "create" : "update"} bet`
+          errorData.error || `Failed to ${isCreate ? "create" : "update"} bet`,
         );
       }
 
@@ -213,7 +223,7 @@ export function AdminDashboard() {
   const handleStatusSubmit = async (
     betId: number,
     status: string,
-    winningOption?: string
+    winningOption?: string,
   ) => {
     try {
       const token = localStorage.getItem("token");
@@ -237,6 +247,85 @@ export function AdminDashboard() {
       setBets(bets.map((b) => (b.id === betId ? result.bet : b)));
     } catch (error) {
       console.error("Status change error:", error);
+      throw error;
+    }
+  };
+
+  const handleAddAssignees = async (userIds: number[]) => {
+    try {
+      const token = localStorage.getItem("token");
+      if (!token) throw new Error("No authentication token");
+
+      const response = await fetch(`/api/bets/${selectedBet?.id}/assignees`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({ assignees: userIds }),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || "Failed to add assignees");
+      }
+
+      const result = await response.json();
+
+      // Update the bet with new assignees
+      setBets(
+        bets.map((b) =>
+          b.id === selectedBet?.id ? { ...b, assignees: result.assignees } : b,
+        ),
+      );
+
+      // Update selected bet
+      if (selectedBet) {
+        setSelectedBet({ ...selectedBet, assignees: result.assignees });
+      }
+    } catch (error) {
+      console.error("Add assignees error:", error);
+      throw error;
+    }
+  };
+
+  const handleRemoveAssignee = async (userId: number) => {
+    try {
+      const token = localStorage.getItem("token");
+      if (!token) throw new Error("No authentication token");
+
+      const response = await fetch(
+        `/api/bets/${selectedBet?.id}/remove-assignee`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({ userId }),
+        },
+      );
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || "Failed to remove assignee");
+      }
+
+      const result = await response.json();
+
+      // Update the bet with remaining assignees
+      setBets(
+        bets.map((b) =>
+          b.id === selectedBet?.id ? { ...b, assignees: result.assignees } : b,
+        ),
+      );
+
+      // Update selected bet
+      if (selectedBet) {
+        setSelectedBet({ ...selectedBet, assignees: result.assignees });
+      }
+    } catch (error) {
+      console.error("Remove assignee error:", error);
       throw error;
     }
   };
@@ -367,6 +456,9 @@ export function AdminDashboard() {
                 onEditBet={handleEditBet}
                 onStatusChange={handleStatusChange}
                 onDeleteBet={handleDeleteBet}
+                onManageAssignees={handleManageAssignees}
+                visibilityFilter={visibilityFilter}
+                onVisibilityFilterChange={setVisibilityFilter}
               />
             )}
           </TabsContent>
@@ -386,6 +478,7 @@ export function AdminDashboard() {
           bet={selectedBet}
           onSubmit={handleBetSubmit}
           mode={betModalMode}
+          users={users}
         />
 
         <StatusModal
@@ -393,6 +486,17 @@ export function AdminDashboard() {
           onClose={() => setIsStatusModalOpen(false)}
           bet={selectedBet}
           onSubmit={handleStatusSubmit}
+        />
+
+        <AssigneesModal
+          isOpen={isAssigneesModalOpen}
+          onClose={() => setIsAssigneesModalOpen(false)}
+          betId={selectedBet?.id || 0}
+          betTitle={selectedBet?.title || ""}
+          assignees={selectedBet?.assignees || []}
+          availableUsers={users}
+          onAddAssignees={handleAddAssignees}
+          onRemoveAssignee={handleRemoveAssignee}
         />
       </div>
     </div>

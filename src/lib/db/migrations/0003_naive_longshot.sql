@@ -5,5 +5,5 @@ CREATE TABLE IF NOT EXISTS "terms_and_conditions" (
 	"updated_at" timestamp DEFAULT now() NOT NULL
 );
 --> statement-breakpoint
-ALTER TABLE "users" ADD COLUMN "has_accepted_terms" boolean DEFAULT false NOT NULL;--> statement-breakpoint
-ALTER TABLE "users" ADD COLUMN "accepted_terms_at" timestamp;
+ALTER TABLE "users" ADD COLUMN IF NOT EXISTS "has_accepted_terms" boolean DEFAULT false NOT NULL;--> statement-breakpoint
+ALTER TABLE "users" ADD COLUMN IF NOT EXISTS "accepted_terms_at" timestamp;

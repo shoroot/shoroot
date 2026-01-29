@@ -9,6 +9,7 @@ should always consider both mobile and desktop responsiveness .
 - The app has two user roles: regular users and admins
 - Users can browse bets and participate in active ones
 - Admins can create, edit, and manage all bets and users
+- the project is now in production. so be causious with the code and database management and migrations.
 
 ## Development Workflow
 
@@ -17,51 +18,43 @@ When given a task to implement a feature:
 1. **Read the Agent Behavior File**: Always start by reading `agent/agents-behaviour.md` to understand your role and rules
 
 2. **Read Feature-Specific Documentation**:
-
    - Read the MD file in `agent/` that matches the feature name (e.g., `auth-page.md`, `navbar.md`)
    - Read any related files mentioned in the feature documentation
    - Read the corresponding task file in `agent/agents-tasks/` for the implementation checklist
 
 3. **File Structure Compliance**:
-
    - Follow the exact file structure specified in `agent/file-structures.md`
    - Each component lives in its own folder with `component.tsx`, `types.ts`, `utils.ts`, and `index.ts`
    - Backend routes are in nested folders under `/api/` matching URL structure
 
 4. **Task Management**:
-
    - Each feature has a task list in `agent/agents-tasks/` with checkboxes
    - Update individual checkboxes as you complete each step
    - Mark the entire task complete only when all checkboxes are done
    - Use the `update_todo_list` tool to track progress
 
 5. **Code Quality Standards**:
-
    - Use TypeScript throughout
    - Follow the tech stack specified in `agent/tech-stack.md`
    - Implement proper error handling and validation
    - Write clean, readable code with appropriate comments
 
 6. **Database Operations**:
-
    - Always read `agent/database.md` and `agent/db-schema.md` before any DB work
    - Use Drizzle ORM with code-first approach
    - Generate and run migrations for any schema changes
 
 7. **State Management**:
-
    - All state is global using Zustand stores
    - Read `agent/big-picture.md` for state management guidelines
    - Create stores in `src/stores/` with corresponding hooks in `src/hooks/`
 
 8. **Component Organization**:
-
    - Follow the component folder structure from `agent/big-picture.md`
    - Each component in its own folder with full structure
    - Use Shadcn components as specified
 
 9. **Authentication & Authorization**:
-
    - Read `agent/users-roles.md` for role definitions
    - Implement proper JWT authentication
    - Add role-based access control for admin features

@@ -1,8 +1,16 @@
 export interface User {
   id: number;
   email: string;
+  fullName?: string;
   role: "admin" | "user";
   createdAt: string;
+}
+
+export interface Assignee {
+  userId: number;
+  email: string;
+  fullName?: string;
+  assignedAt: string;
 }
 
 export interface Bet {
@@ -11,10 +19,13 @@ export interface Bet {
   description: string;
   amount: number;
   status: "active" | "in-progress" | "resolved";
+  visibility: "public" | "private";
   winningOption?: string;
   options: BetOption[];
   participationCount: number;
+  assignees?: Assignee[];
   createdAt: string;
+  updatedAt?: string;
 }
 
 export interface BetOption {
@@ -39,6 +50,8 @@ export interface CreateBetData {
   description: string;
   amount: number;
   options: string[];
+  visibility: "public" | "private";
+  assignees?: number[];
 }
 
 export interface UpdateBetData {
@@ -46,6 +59,8 @@ export interface UpdateBetData {
   description?: string;
   amount?: number;
   options?: string[];
+  visibility?: "public" | "private";
+  assignees?: number[];
 }
 
 export interface AdminStats {

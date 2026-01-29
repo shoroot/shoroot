@@ -29,6 +29,9 @@ export const bets = pgTable("bets", {
   status: text("status", {
     enum: ["active", "in-progress", "resolved"],
   }).notNull(),
+  visibility: text("visibility", { enum: ["public", "private"] })
+    .default("public")
+    .notNull(),
   winningOption: text("winning_option"),
   createdAt: timestamp("created_at").defaultNow().notNull(),
   updatedAt: timestamp("updated_at").defaultNow().notNull(),
@@ -54,14 +57,14 @@ export const betParticipations = pgTable(
       .notNull()
       .references(() => bets.id),
     selectedOptionId: integer("selected_option_id").references(
-      () => betOptions.id
+      () => betOptions.id,
     ),
     isWinner: boolean("is_winner"),
     participatedAt: timestamp("participated_at").defaultNow().notNull(),
   },
   (table) => ({
     uniqueUserBet: uniqueIndex("unique_user_bet").on(table.userId, table.betId),
-  })
+  }),
 );
 
 export const usersRelations = relations(users, ({ many }) => ({
@@ -117,7 +120,7 @@ export const betParticipationsRelations = relations(
       fields: [betParticipations.selectedOptionId],
       references: [betOptions.id],
     }),
-  })
+  }),
 );
 
 export const termsAndConditions = pgTable("terms_and_conditions", {
@@ -130,6 +133,44 @@ export const termsAndConditions = pgTable("terms_and_conditions", {
 export const notificationsRelations = relations(notifications, ({ one }) => ({
   user: one(users, {
     fields: [notifications.userId],
+    references: [users.id],
+  }),
+}));
+
+export const betAssignees = pgTable(
+  "bet_assignees",
+  {
+    id: serial("id").primaryKey(),
+    betId: integer("bet_id")
+      .notNull()
+      .references(() => bets.id, { onDelete: "cascade" }),
+    userId: integer("user_id")
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
+    assignedAt: timestamp("assigned_at").defaultNow().notNull(),
+    assignedBy: integer("assigned_by")
+      .notNull()
+      .references(() => users.id),
+  },
+  (table) => ({
+    uniqueBetUser: uniqueIndex("unique_bet_user_assignee").on(
+      table.betId,
+      table.userId,
+    ),
+  }),
+);
+
+export const betAssigneesRelations = relations(betAssignees, ({ one }) => ({
+  bet: one(bets, {
+    fields: [betAssignees.betId],
+    references: [bets.id],
+  }),
+  user: one(users, {
+    fields: [betAssignees.userId],
+    references: [users.id],
+  }),
+  assigner: one(users, {
+    fields: [betAssignees.assignedBy],
     references: [users.id],
   }),
 }));

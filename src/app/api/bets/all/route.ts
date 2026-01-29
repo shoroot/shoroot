@@ -1,7 +1,13 @@
 import { NextRequest, NextResponse } from "next/server";
 import jwt from "jsonwebtoken";
 import { db } from "@/lib/db";
-import { bets, betOptions, betParticipations } from "@/lib/db/schema";
+import {
+  bets,
+  betOptions,
+  betParticipations,
+  betAssignees,
+  users,
+} from "@/lib/db/schema";
 import { eq, count } from "drizzle-orm";
 
 export async function GET(request: NextRequest) {
@@ -10,7 +16,7 @@ export async function GET(request: NextRequest) {
     if (!authHeader || !authHeader.startsWith("Bearer ")) {
       return NextResponse.json(
         { error: "Authorization header required" },
-        { status: 401 }
+        { status: 401 },
       );
     }
 
@@ -26,7 +32,7 @@ export async function GET(request: NextRequest) {
     if (decoded.role !== "admin") {
       return NextResponse.json(
         { error: "Admin access required" },
-        { status: 403 }
+        { status: 403 },
       );
     }
 
@@ -38,6 +44,7 @@ export async function GET(request: NextRequest) {
         description: bets.description,
         amount: bets.amount,
         status: bets.status,
+        visibility: bets.visibility,
         winningOption: bets.winningOption,
         createdAt: bets.createdAt,
         updatedAt: bets.updatedAt,
@@ -64,11 +71,24 @@ export async function GET(request: NextRequest) {
       .from(betParticipations)
       .groupBy(betParticipations.betId);
 
+    // Get assignees for private bets
+    const assigneesData = await db
+      .select({
+        betId: betAssignees.betId,
+        userId: betAssignees.userId,
+        email: users.email,
+        fullName: users.fullName,
+        assignedAt: betAssignees.assignedAt,
+      })
+      .from(betAssignees)
+      .innerJoin(users, eq(betAssignees.userId, users.id));
+
     // Combine data
     const formattedBets = betsData.map((bet) => {
       const betOptions = options.filter((opt) => opt.betId === bet.id);
       const participationCount =
         participationCounts.find((p) => p.betId === bet.id)?.count || 0;
+      const betAssignees = assigneesData.filter((a) => a.betId === bet.id);
 
       return {
         id: bet.id,
@@ -76,12 +96,22 @@ export async function GET(request: NextRequest) {
         description: bet.description,
         amount: bet.amount,
         status: bet.status,
+        visibility: bet.visibility,
         winningOption: bet.winningOption,
         options: betOptions.map((opt) => ({
           id: opt.id,
           optionText: opt.optionText,
         })),
         participationCount,
+        assignees:
+          bet.visibility === "private"
+            ? betAssignees.map((a) => ({
+                userId: a.userId,
+                email: a.email,
+                fullName: a.fullName,
+                assignedAt: a.assignedAt,
+              }))
+            : undefined,
         createdAt: bet.createdAt,
         updatedAt: bet.updatedAt,
       };
@@ -92,7 +122,7 @@ export async function GET(request: NextRequest) {
     console.error("Get all bets error:", error);
     return NextResponse.json(
       { error: "Internal server error" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

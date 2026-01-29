@@ -1,1 +1,1 @@
-ALTER TABLE "users" ADD COLUMN "full_name" text;
+ALTER TABLE "users" ADD COLUMN IF NOT EXISTS "full_name" text;
