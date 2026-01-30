@@ -26,6 +26,20 @@ export async function PATCH(request: NextRequest) {
       role: string;
     };
 
+    // Fetch user to check status
+    const [currentUser] = await db
+      .select({ status: users.status })
+      .from(users)
+      .where(eq(users.id, decoded.userId))
+      .limit(1);
+
+    if (!currentUser || currentUser.status !== "active") {
+      return NextResponse.json(
+        { error: "Your account is not active. Please contact admin." },
+        { status: 403 },
+      );
+    }
+
     // Parse request body
     const body = await request.json();
     const validatedData = updateProfileSchema.parse(body);
@@ -44,14 +58,14 @@ export async function PATCH(request: NextRequest) {
     if (error instanceof z.ZodError) {
       return NextResponse.json(
         { error: error.errors[0].message },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
     console.error("Profile update error:", error);
     return NextResponse.json(
       { error: "Internal server error" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
@@ -96,7 +110,7 @@ export async function GET(request: NextRequest) {
     console.error("Profile fetch error:", error);
     return NextResponse.json(
       { error: "Internal server error" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

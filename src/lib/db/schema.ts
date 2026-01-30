@@ -15,6 +15,9 @@ export const users = pgTable("users", {
   fullName: text("full_name"),
   password: text("password").notNull(),
   role: text("role", { enum: ["admin", "user"] }).notNull(),
+  status: text("status", { enum: ["pending", "active", "deactivated"] })
+    .default("pending")
+    .notNull(),
   hasAcceptedTerms: boolean("has_accepted_terms").default(false).notNull(),
   acceptedTermsAt: timestamp("accepted_terms_at"),
   createdAt: timestamp("created_at").defaultNow().notNull(),

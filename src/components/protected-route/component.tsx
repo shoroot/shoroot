@@ -20,6 +20,10 @@ export function ProtectedRoute({
     if (!isLoading) {
       if (!isAuthenticated) {
         router.push("/auth/login");
+      } else if (user?.status === "pending") {
+        router.push("/pending");
+      } else if (user?.status === "deactivated") {
+        router.push("/suspended");
       } else if (requireAdmin && user?.role !== "admin") {
         router.push("/dashboard");
       }

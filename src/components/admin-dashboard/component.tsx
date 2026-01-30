@@ -42,6 +42,9 @@ export function AdminDashboard() {
   const [visibilityFilter, setVisibilityFilter] = useState<
     "all" | "public" | "private"
   >("all");
+  const [userStatusFilter, setUserStatusFilter] = useState<
+    "all" | "pending" | "active" | "deactivated"
+  >("all");
   const { user } = useAuth();
 
   const handleCreateUser = () => {
@@ -330,6 +333,87 @@ export function AdminDashboard() {
     }
   };
 
+  const handleApproveUser = async (userId: number) => {
+    if (!confirm("Are you sure you want to approve this user?")) {
+      return;
+    }
+
+    try {
+      const token = localStorage.getItem("token");
+      if (!token) throw new Error("No authentication token");
+
+      const response = await fetch(`/api/users/${userId}/approve`, {
+        method: "POST",
+        headers: { Authorization: `Bearer ${token}` },
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || "Failed to approve user");
+      }
+
+      const result = await response.json();
+      setUsers(users.map((u) => (u.id === userId ? result.user : u)));
+    } catch (error) {
+      console.error("Approve user error:", error);
+      alert("Failed to approve user");
+    }
+  };
+
+  const handleDeactivateUser = async (userId: number) => {
+    if (!confirm("Are you sure you want to deactivate this user?")) {
+      return;
+    }
+
+    try {
+      const token = localStorage.getItem("token");
+      if (!token) throw new Error("No authentication token");
+
+      const response = await fetch(`/api/users/${userId}/deactivate`, {
+        method: "POST",
+        headers: { Authorization: `Bearer ${token}` },
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || "Failed to deactivate user");
+      }
+
+      const result = await response.json();
+      setUsers(users.map((u) => (u.id === userId ? result.user : u)));
+    } catch (error) {
+      console.error("Deactivate user error:", error);
+      alert("Failed to deactivate user");
+    }
+  };
+
+  const handleReactivateUser = async (userId: number) => {
+    if (!confirm("Are you sure you want to reactivate this user?")) {
+      return;
+    }
+
+    try {
+      const token = localStorage.getItem("token");
+      if (!token) throw new Error("No authentication token");
+
+      const response = await fetch(`/api/users/${userId}/reactivate`, {
+        method: "POST",
+        headers: { Authorization: `Bearer ${token}` },
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || "Failed to reactivate user");
+      }
+
+      const result = await response.json();
+      setUsers(users.map((u) => (u.id === userId ? result.user : u)));
+    } catch (error) {
+      console.error("Reactivate user error:", error);
+      alert("Failed to reactivate user");
+    }
+  };
+
   useEffect(() => {
     const fetchData = async () => {
       if (!user || user.role !== "admin") return;
@@ -437,6 +521,11 @@ export function AdminDashboard() {
                 onCreateUser={handleCreateUser}
                 onEditUser={handleEditUser}
                 onDeleteUser={handleDeleteUser}
+                onApproveUser={handleApproveUser}
+                onDeactivateUser={handleDeactivateUser}
+                onReactivateUser={handleReactivateUser}
+                statusFilter={userStatusFilter}
+                onStatusFilterChange={setUserStatusFilter}
               />
             )}
           </TabsContent>

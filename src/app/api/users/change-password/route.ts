@@ -14,7 +14,7 @@ export async function POST(request: NextRequest) {
     if (!current_password || !new_password || !confirm_password) {
       return NextResponse.json(
         { error: "All password fields are required" },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -22,7 +22,7 @@ export async function POST(request: NextRequest) {
     if (new_password !== confirm_password) {
       return NextResponse.json(
         { error: "New passwords don't match" },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -52,16 +52,24 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "User not found" }, { status: 404 });
     }
 
+    // Check user status
+    if (user.status !== "active") {
+      return NextResponse.json(
+        { error: "Your account is not active. Please contact admin." },
+        { status: 403 },
+      );
+    }
+
     // Verify current password
     const isCurrentPasswordValid = bcrypt.compareSync(
       current_password,
-      user.password
+      user.password,
     );
 
     if (!isCurrentPasswordValid) {
       return NextResponse.json(
         { error: "Current password is incorrect" },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -84,7 +92,7 @@ export async function POST(request: NextRequest) {
     console.error("Password change error:", error);
     return NextResponse.json(
       { error: "Internal server error" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

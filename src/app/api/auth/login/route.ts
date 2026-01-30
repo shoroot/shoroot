@@ -15,7 +15,7 @@ export async function POST(request: NextRequest) {
     if (!normalizedEmail || !password) {
       return NextResponse.json(
         { error: "Email and password are required" },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -29,7 +29,7 @@ export async function POST(request: NextRequest) {
     if (!user) {
       return NextResponse.json(
         { error: "Invalid credentials" },
-        { status: 401 }
+        { status: 401 },
       );
     }
 
@@ -39,7 +39,22 @@ export async function POST(request: NextRequest) {
     if (!isPasswordValid) {
       return NextResponse.json(
         { error: "Invalid credentials" },
-        { status: 401 }
+        { status: 401 },
+      );
+    }
+
+    // Check user status
+    if (user.status === "pending") {
+      return NextResponse.json(
+        { error: "Account pending approval", status: "pending" },
+        { status: 403 },
+      );
+    }
+
+    if (user.status === "deactivated") {
+      return NextResponse.json(
+        { error: "Account suspended", status: "deactivated" },
+        { status: 403 },
       );
     }
 
@@ -49,9 +64,10 @@ export async function POST(request: NextRequest) {
         userId: user.id,
         email: user.email,
         role: user.role,
+        status: user.status,
       },
       process.env.NEXTAUTH_SECRET!,
-      { expiresIn: "7d" }
+      { expiresIn: "7d" },
     );
 
     // Return token and user data (excluding password)
@@ -65,7 +81,7 @@ export async function POST(request: NextRequest) {
     console.error("Login error:", error);
     return NextResponse.json(
       { error: "Internal server error" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

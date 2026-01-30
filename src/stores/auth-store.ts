@@ -5,6 +5,7 @@ export interface User {
   email: string;
   fullName: string | null;
   role: "admin" | "user";
+  status: "pending" | "active" | "deactivated";
   hasAcceptedTerms: boolean;
   acceptedTermsAt: string | null;
   createdAt: string;

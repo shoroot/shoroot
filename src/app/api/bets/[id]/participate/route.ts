@@ -7,7 +7,7 @@ import { notifyBetParticipants } from "@/lib/notifications";
 
 export async function POST(
   request: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
+  { params }: { params: Promise<{ id: string }> },
 ) {
   try {
     const { id } = await params;
@@ -31,12 +31,26 @@ export async function POST(
       role: string;
     };
 
+    // Fetch user to check status
+    const [currentUser] = await db
+      .select({ status: users.status, fullName: users.fullName })
+      .from(users)
+      .where(eq(users.id, decoded.userId))
+      .limit(1);
+
+    if (!currentUser || currentUser.status !== "active") {
+      return NextResponse.json(
+        { error: "Your account is not active. Please contact admin." },
+        { status: 403 },
+      );
+    }
+
     const { selectedOptionId } = await request.json();
 
     if (!selectedOptionId) {
       return NextResponse.json(
         { error: "Selected option ID is required" },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -54,7 +68,7 @@ export async function POST(
     if (bet.status !== "active") {
       return NextResponse.json(
         { error: "Bet is not available for participation" },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -63,14 +77,14 @@ export async function POST(
       .select()
       .from(betOptions)
       .where(
-        and(eq(betOptions.id, selectedOptionId), eq(betOptions.betId, betId))
+        and(eq(betOptions.id, selectedOptionId), eq(betOptions.betId, betId)),
       )
       .limit(1);
 
     if (!selectedOption) {
       return NextResponse.json(
         { error: "Selected option does not exist for this bet" },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -81,24 +95,17 @@ export async function POST(
       .where(
         and(
           eq(betParticipations.betId, betId),
-          eq(betParticipations.userId, decoded.userId)
-        )
+          eq(betParticipations.userId, decoded.userId),
+        ),
       )
       .limit(1);
 
     if (existingParticipation) {
       return NextResponse.json(
         { error: "You have already participated in this bet" },
-        { status: 400 }
+        { status: 400 },
       );
     }
-
-    // Get user details for notification
-    const [user] = await db
-      .select({ fullName: users.fullName })
-      .from(users)
-      .where(eq(users.id, decoded.userId))
-      .limit(1);
 
     // Create participation record
     await db.insert(betParticipations).values({
@@ -112,16 +119,16 @@ export async function POST(
       betId,
       "new_participant",
       `New participant in: ${bet.title}`,
-      `${user?.fullName || "A user"} joined the bet and chose "${
+      `${currentUser?.fullName || "A user"} joined the bet and chose "${
         selectedOption.optionText
       }".`,
       {
         betId,
         betTitle: bet.title,
-        userFullName: user?.fullName || "Unknown User",
+        userFullName: currentUser?.fullName || "Unknown User",
         selectedOption: selectedOption.optionText,
       },
-      decoded.userId // exclude the new participant from notification
+      decoded.userId, // exclude the new participant from notification
     );
 
     return NextResponse.json({
@@ -131,7 +138,7 @@ export async function POST(
     console.error("Participation error:", error);
     return NextResponse.json(
       { error: "Internal server error" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

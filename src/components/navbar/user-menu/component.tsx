@@ -58,7 +58,7 @@ export function UserMenu({ user, isAdmin, logout }: UserMenuProps) {
           </DropdownMenuItem>
           <DropdownMenuItem asChild className="cursor-pointer hover:bg-accent">
             <Link href="/" className="flex items-center">
-              <span>Public Bets</span>
+              <span>Home</span>
             </Link>
           </DropdownMenuItem>
           <DropdownMenuItem asChild className="cursor-pointer hover:bg-accent">

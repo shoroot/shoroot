@@ -110,6 +110,7 @@ export function BetModal({
   const filteredUsers = users.filter(
     (user) =>
       user.role === "user" &&
+      user.status === "active" &&
       (user.email.toLowerCase().includes(assigneeSearch.toLowerCase()) ||
         user.fullName?.toLowerCase().includes(assigneeSearch.toLowerCase())) &&
       !selectedAssignees.includes(user.id),

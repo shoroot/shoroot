@@ -93,15 +93,32 @@ export async function POST(
       );
     }
 
-    // Validate that all assignees exist
+    // Validate that all assignees exist and are active
     const existingUsers = await db
-      .select({ id: users.id, email: users.email, fullName: users.fullName })
+      .select({
+        id: users.id,
+        email: users.email,
+        fullName: users.fullName,
+        status: users.status,
+      })
       .from(users)
       .where(inArray(users.id, newAssigneeIds));
 
     if (existingUsers.length !== newAssigneeIds.length) {
       return NextResponse.json(
         { error: "One or more users do not exist" },
+        { status: 400 },
+      );
+    }
+
+    // Check that all users are active
+    const inactiveUsers = existingUsers.filter((u) => u.status !== "active");
+    if (inactiveUsers.length > 0) {
+      return NextResponse.json(
+        {
+          error:
+            "Cannot assign inactive users (pending or deactivated) to bets",
+        },
         { status: 400 },
       );
     }
@@ -115,7 +132,7 @@ export async function POST(
       })),
     );
 
-    // Get all current assignees after update
+    // Get all current assignees after update - only active users
     const allAssignees = await db
       .select({
         userId: betAssignees.userId,
@@ -125,7 +142,7 @@ export async function POST(
       })
       .from(betAssignees)
       .innerJoin(users, eq(betAssignees.userId, users.id))
-      .where(eq(betAssignees.betId, betId));
+      .where(and(eq(betAssignees.betId, betId), eq(users.status, "active")));
 
     return NextResponse.json({
       message: "Assignees added successfully",

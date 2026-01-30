@@ -41,13 +41,26 @@ export const getRoleColor = (role: string): string => {
   }
 };
 
+export const getUserStatusColor = (status: string): string => {
+  switch (status) {
+    case "active":
+      return "bg-green-100 text-green-800";
+    case "pending":
+      return "bg-yellow-100 text-yellow-800";
+    case "deactivated":
+      return "bg-red-100 text-red-800";
+    default:
+      return "bg-gray-100 text-gray-800";
+  }
+};
+
 export const validateEmail = (email: string): boolean => {
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
   return emailRegex.test(email);
 };
 
 export const validatePassword = (
-  password: string
+  password: string,
 ): { isValid: boolean; message?: string } => {
   if (password.length < 6) {
     return {
@@ -59,7 +72,7 @@ export const validatePassword = (
 };
 
 export const validateBetOptions = (
-  options: string[]
+  options: string[],
 ): { isValid: boolean; message?: string } => {
   if (options.length < 2) {
     return { isValid: false, message: "At least 2 options are required" };

@@ -24,7 +24,7 @@ export async function GET(request: NextRequest) {
     if (decoded.role !== "admin") {
       return NextResponse.json(
         { error: "Admin access required" },
-        { status: 403 }
+        { status: 403 },
       );
     }
 
@@ -33,7 +33,9 @@ export async function GET(request: NextRequest) {
       .select({
         id: users.id,
         email: users.email,
+        fullName: users.fullName,
         role: users.role,
+        status: users.status,
         createdAt: users.createdAt,
         updatedAt: users.updatedAt,
       })
@@ -45,7 +47,7 @@ export async function GET(request: NextRequest) {
     console.error("Users fetch error:", error);
     return NextResponse.json(
       { error: "Internal server error" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

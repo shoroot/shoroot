@@ -46,6 +46,17 @@ const defaultCarouselItems: CarouselItem[] = [
     },
     variant: "split",
   },
+  {
+    id: 3,
+    image: "/mr-shoroot-new-mascot.png",
+    title: "Mr. Shoroot",
+    subtitle: "presenting our new mascot",
+    // primaryButton: {
+    //   text: "Start Betting",
+    //   link: "/dashboard",
+    // },
+    variant: "split",
+  },
 ];
 
 function FullscreenSlide({ item }: { item: CarouselItem }) {

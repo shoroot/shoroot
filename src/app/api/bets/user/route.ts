@@ -28,6 +28,14 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: "Invalid token" }, { status: 401 });
     }
 
+    // Check user status - only active users can access bets
+    if (decoded.status !== "active") {
+      return NextResponse.json(
+        { error: "Your account is not active. Please contact admin." },
+        { status: 403 },
+      );
+    }
+
     const userId = decoded.userId;
     const userRole = decoded.role;
     const isAdmin = userRole === "admin";

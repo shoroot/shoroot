@@ -63,7 +63,26 @@ export function LoginForm({ onToggleToSignup }: LoginFormProps) {
       if (response.ok) {
         localStorage.setItem("token", data.token);
         login(data.user);
-        router.push("/");
+
+        // Redirect based on user status
+        if (data.user.status === "pending") {
+          router.push("/pending");
+        } else if (data.user.status === "deactivated") {
+          router.push("/suspended");
+        } else {
+          router.push("/");
+        }
+      } else if (response.status === 403 && data.status) {
+        // Handle pending/deactivated status from login
+        if (data.status === "pending") {
+          setError(
+            "Your account is pending approval. Please wait for admin approval.",
+          );
+        } else if (data.status === "deactivated") {
+          setError("Your account has been suspended. Please contact admin.");
+        } else {
+          setError(data.error || "Login failed");
+        }
       } else {
         setError(data.error || "Login failed");
       }

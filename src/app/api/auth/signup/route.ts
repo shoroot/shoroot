@@ -19,28 +19,28 @@ export async function POST(request: NextRequest) {
           error:
             "Email, password, confirm password, and full name are required",
         },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
     if (fullName.trim().length < 3) {
       return NextResponse.json(
         { error: "Full name must be at least 3 characters long" },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
     if (password !== confirmPassword) {
       return NextResponse.json(
         { error: "Passwords do not match" },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
     if (password.length < 6) {
       return NextResponse.json(
         { error: "Password must be at least 6 characters long" },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -54,14 +54,14 @@ export async function POST(request: NextRequest) {
     if (existingUser) {
       return NextResponse.json(
         { error: "User with this email already exists" },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
     // Hash password
     const hashedPassword = bcrypt.hashSync(password, 10);
 
-    // Create user
+    // Create user with pending status (default in schema)
     const [newUser] = await db
       .insert(users)
       .values({
@@ -69,48 +69,39 @@ export async function POST(request: NextRequest) {
         fullName: fullName.trim(),
         password: hashedPassword,
         role: "user",
+        status: "pending",
       })
       .returning();
-
-    // Generate JWT token
-    const token = jwt.sign(
-      {
-        userId: newUser.id,
-        email: newUser.email,
-        role: newUser.role,
-      },
-      process.env.NEXTAUTH_SECRET!,
-      { expiresIn: "7d" }
-    );
 
     // Notify admins about new user registration
     notifyAdmins(
       "new_user",
       `New user registered: ${newUser.fullName || "Unknown User"}`,
-      `A new user has joined the platform.`,
+      `A new user has joined the platform and is pending approval.`,
       {
         userFullName: newUser.fullName || "Unknown User",
         registrationDate:
           newUser.createdAt?.toISOString().split("T")[0] ||
           new Date().toISOString().split("T")[0],
-      }
+      },
     );
 
-    // Return token and user data (excluding password)
+    // Return user data (excluding password) - no token for pending users
     const { password: _, ...userData } = newUser;
 
     return NextResponse.json(
       {
-        token,
+        message:
+          "Account created successfully. Your account is pending admin approval.",
         user: userData,
       },
-      { status: 201 }
+      { status: 201 },
     );
   } catch (error) {
     console.error("Signup error:", error);
     return NextResponse.json(
       { error: "Internal server error" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
