@@ -49,19 +49,30 @@ export async function POST(
       assignees: newAssignees,
     } = await request.json();
 
-    if (!title || !description || !amount) {
+    // Validate fields only if they are provided (partial update support)
+    if (title !== undefined && !title.trim()) {
       return NextResponse.json(
-        { error: "Title, description, and amount are required" },
+        { error: "Title cannot be empty" },
         { status: 400 },
       );
     }
 
-    const numericAmount = parseInt(amount);
-    if (isNaN(numericAmount) || numericAmount <= 0) {
+    if (description !== undefined && !description.trim()) {
       return NextResponse.json(
-        { error: "Amount must be a positive number" },
+        { error: "Description cannot be empty" },
         { status: 400 },
       );
+    }
+
+    let numericAmount: number | undefined;
+    if (amount !== undefined) {
+      numericAmount = parseInt(amount);
+      if (isNaN(numericAmount) || numericAmount <= 0) {
+        return NextResponse.json(
+          { error: "Amount must be a positive number" },
+          { status: 400 },
+        );
+      }
     }
 
     // Validate visibility if provided
@@ -95,11 +106,21 @@ export async function POST(
     const result = await db.transaction(async (tx) => {
       // Update the bet
       const updateData: any = {
-        title: title.trim(),
-        description: description.trim(),
-        amount: numericAmount,
         updatedAt: new Date(),
       };
+
+      // Only include fields that are provided
+      if (title !== undefined) {
+        updateData.title = title.trim();
+      }
+
+      if (description !== undefined) {
+        updateData.description = description.trim();
+      }
+
+      if (numericAmount !== undefined) {
+        updateData.amount = numericAmount;
+      }
 
       if (visibility) {
         updateData.visibility = visibility;
