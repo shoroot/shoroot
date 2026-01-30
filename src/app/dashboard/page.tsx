@@ -1,5 +1,10 @@
 import { UserBetsDashboard } from "@/components/user-bets-dashboard";
+import { ProtectedRoute } from "@/components/protected-route";
 
 export default function DashboardPage() {
-  return <UserBetsDashboard />;
+  return (
+    <ProtectedRoute>
+      <UserBetsDashboard />
+    </ProtectedRoute>
+  );
 }

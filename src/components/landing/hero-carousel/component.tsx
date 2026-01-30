@@ -16,7 +16,7 @@ const defaultCarouselItems: CarouselItem[] = [
     subtitle: "The ultimate betting platform",
     primaryButton: {
       text: "Get Started",
-      link: "/auth/signup",
+      link: "/dashboard",
     },
     variant: "split",
   },
@@ -27,7 +27,7 @@ const defaultCarouselItems: CarouselItem[] = [
     subtitle: "Sports, events, and more",
     primaryButton: {
       text: "Join Now",
-      link: "/auth/signup",
+      link: "/dashboard",
     },
     secondaryButton: {
       text: "View Matches",
@@ -42,7 +42,7 @@ const defaultCarouselItems: CarouselItem[] = [
     subtitle: "Track your performance and win",
     primaryButton: {
       text: "Start Betting",
-      link: "/auth/login",
+      link: "/dashboard",
     },
     variant: "split",
   },

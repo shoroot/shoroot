@@ -32,12 +32,12 @@ export function LandingFooter() {
           </div>
 
           <div className="flex items-center gap-6 text-sm text-muted-foreground">
-            <Link
+            {/* <Link
               href="/terms"
               className="hover:text-foreground transition-colors"
             >
               Terms & Conditions
-            </Link>
+            </Link> */}
             <Link
               href="/auth/signup"
               className="hover:text-foreground transition-colors"
