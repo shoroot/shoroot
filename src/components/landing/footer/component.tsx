@@ -39,6 +39,12 @@ export function LandingFooter() {
               Terms & Conditions
             </Link> */}
             <Link
+              href="/about"
+              className="hover:text-foreground transition-colors"
+            >
+              About Us
+            </Link>
+            <Link
               href="/auth/signup"
               className="hover:text-foreground transition-colors"
             >
