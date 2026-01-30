@@ -29,6 +29,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             email: decoded.email,
             fullName: null, // We don't have this from token, will be loaded later
             role: decoded.role as "admin" | "user",
+            status: "active", // Default to active for restored sessions
             // These get added to match the User type in the auth store
             hasAcceptedTerms: false,
             acceptedTermsAt: null,
