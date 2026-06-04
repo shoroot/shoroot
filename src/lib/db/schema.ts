@@ -24,6 +24,24 @@ export const users = pgTable("users", {
   updatedAt: timestamp("updated_at").defaultNow().notNull(),
 });
 
+export const tournaments = pgTable("tournaments", {
+  id: serial("id").primaryKey(),
+  userId: integer("user_id")
+    .notNull()
+    .references(() => users.id, { onDelete: "cascade" }),
+  title: text("title").notNull(),
+  tournamentType: text("tournament_type").notNull().default("world-cup-2026"),
+  status: text("status", {
+    enum: ["draft", "in_progress", "completed"],
+  })
+    .notNull()
+    .default("draft"),
+  definition: text("definition").notNull(),
+  state: text("state").notNull(),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().notNull(),
+});
+
 export const bets = pgTable("bets", {
   id: serial("id").primaryKey(),
   title: text("title").notNull(),
@@ -72,6 +90,14 @@ export const betParticipations = pgTable(
 
 export const usersRelations = relations(users, ({ many }) => ({
   participations: many(betParticipations),
+  tournaments: many(tournaments),
+}));
+
+export const tournamentsRelations = relations(tournaments, ({ one }) => ({
+  user: one(users, {
+    fields: [tournaments.userId],
+    references: [users.id],
+  }),
 }));
 
 export const betsRelations = relations(bets, ({ many }) => ({
