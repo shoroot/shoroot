@@ -68,7 +68,7 @@ type Bracket = {
 };
 
 type GroupStageMode = "auto" | "manual" | "manual-ranking" | null;
-type KnockoutMode = "manual" | null;
+type KnockoutMode = "auto" | "full-auto" | "manual" | null;
 
 type GroupRankings = Record<GroupLetter, Team[]>;
 
