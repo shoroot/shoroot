@@ -43,6 +43,13 @@
       "when": 1769732234808,
       "tag": "0005_little_king_bedlam",
       "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1780820294511,
+      "tag": "0006_nosy_human_torch",
+      "breakpoints": true
     }
   ]
 }
